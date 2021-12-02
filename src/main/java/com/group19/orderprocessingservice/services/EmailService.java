@@ -4,6 +4,7 @@ import com.group19.orderprocessingservice.interfaces.EmailSender;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -32,5 +33,10 @@ public class EmailService implements EmailSender {
             LOG.error("Failed to send email", e);
             throw new IllegalStateException("failed to send email");
         }
+    }
+
+    @Async
+    public void sendEmail(SimpleMailMessage email) {
+        mailSender.send(email);
     }
 }
