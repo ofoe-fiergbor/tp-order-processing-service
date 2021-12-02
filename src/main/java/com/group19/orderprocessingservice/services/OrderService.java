@@ -15,8 +15,6 @@ import java.util.Locale;
 @Service
 public class OrderService {
 
-    private final String key = "d52528c5-1068-4ea0-a5e7-d4e02046b001";
-
     @Autowired
     private RestTemplate restTemplate;
 
@@ -31,26 +29,31 @@ public class OrderService {
 
         String orderToken;
 
-        switch (order.getSide()) {
+        final String key = "d52528c5-1068-4ea0-a5e7-d4e02046b001";
+        switch (order.getSide().toUpperCase()) {
             case "BUY":
+                assert stockProduct1 != null;
+                assert stockProduct2 != null;
                 if (Math.max(stockProduct1.getAskPrice(), stockProduct2.getAskPrice()) == stockProduct1.getAskPrice()) {
                     order.setPrice(stockProduct1.getAskPrice());
-                    orderToken = restTemplate.postForObject("https://exchange.matraining.com/"+key+"/order", order, String.class);
+                    orderToken = restTemplate.postForObject("https://exchange.matraining.com/"+ key +"/order", order, String.class);
                 } else {
                     order.setPrice(stockProduct2.getAskPrice());
-                    orderToken = restTemplate.postForObject("https://exchange2.matraining.com/"+key+"/order", order, String.class);
+                    orderToken = restTemplate.postForObject("https://exchange2.matraining.com/"+ key +"/order", order, String.class);
                 }
                 order.setCreatedAt(new Timestamp(new Date().getTime()));
                 order.setId(orderToken);
                 orderRepository.save(order);
                 return order;
             case "SELL":
+                assert stockProduct1 != null;
+                assert stockProduct2 != null;
                 if (Math.min(stockProduct1.getBidPrice(), stockProduct2.getBidPrice()) == stockProduct1.getBidPrice()) {
                     order.setPrice(stockProduct1.getBidPrice());
-                    orderToken = restTemplate.postForObject("https://exchange.matraining.com/"+key+"/order", order, String.class);
+                    orderToken = restTemplate.postForObject("https://exchange.matraining.com/"+ key +"/order", order, String.class);
                 } else {
                     order.setPrice(stockProduct2.getBidPrice());
-                    orderToken = restTemplate.postForObject("https://exchange2.matraining.com/"+key+"/order", order, String.class);
+                    orderToken = restTemplate.postForObject("https://exchange2.matraining.com/"+ key +"/order", order, String.class);
                 }
                 order.setCreatedAt(new Timestamp(new Date().getTime()));
                 order.setId(orderToken);
