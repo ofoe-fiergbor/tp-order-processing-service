@@ -10,4 +10,15 @@ public class ExceptionControllerAdvice {
     public final ResponseEntity<String> handleCustomException(CustomException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = OrderSideException.class)
+    public final ResponseEntity<String> handleOrderSideException(OrderSideException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = OrderSideException.class)
+    public final ResponseEntity<String> handleAuthenticationFailedException(AuthenticationFailedException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 }

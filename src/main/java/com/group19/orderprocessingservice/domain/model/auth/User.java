@@ -1,9 +1,11 @@
 package com.group19.orderprocessingservice.domain.model.auth;
 
+import com.group19.orderprocessingservice.domain.model.order.Portfolio;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -13,7 +15,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private long id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -26,6 +28,10 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @OneToMany(targetEntity = Portfolio.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "portfolioId", referencedColumnName = "id")
+    private List<Portfolio> portfolioList;
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;

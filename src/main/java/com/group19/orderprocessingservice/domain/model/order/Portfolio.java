@@ -8,11 +8,12 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "portfolio")
+@Table(name = "portfolios")
 public class Portfolio {
 
     @Id
@@ -27,9 +28,14 @@ public class Portfolio {
     @Enumerated(EnumType.STRING)
     private PortfolioStatus portfolioStatus;
 
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
+    @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
+
+    @OneToMany(targetEntity = Order.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "orderId", referencedColumnName = "id")
+    private List<Order> orderList;
+
 
     public Portfolio(User user) {
         this.user = user;

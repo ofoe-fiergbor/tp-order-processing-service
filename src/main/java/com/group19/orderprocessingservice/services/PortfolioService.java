@@ -8,6 +8,7 @@ import com.group19.orderprocessingservice.domain.repository.auth.UserRepository;
 import com.group19.orderprocessingservice.domain.repository.order.PortfolioRepository;
 import com.group19.orderprocessingservice.enums.PortfolioStatus;
 import com.group19.orderprocessingservice.exceptions.CustomException;
+import com.group19.orderprocessingservice.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,32 +20,29 @@ import java.util.Optional;
 public class PortfolioService {
 
     @Autowired
-    PortfolioRepository portfolioRepository;
+    private PortfolioRepository portfolioRepository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
-    @Transactional
     public Portfolio createNewPortfolio(CreatePortfolioDto cpdto) {
         //check if user exists
-        User user = checkIfUserExists(cpdto.getUserId());
+        User user = Utils.checkIfUserExists(cpdto.getUserId(), userRepository);
         //create new portfolio
         Portfolio portfolio = new Portfolio(user);
         //persist portfolio in database
         return portfolioRepository.save(portfolio);
     }
 
-    @Transactional
     public Iterable<Portfolio> fetchAll(CreatePortfolioDto cpdto) {
         //check the existence of the user
-        checkIfUserExists(cpdto.getUserId());
+        Utils.checkIfUserExists(cpdto.getUserId(), userRepository);
         //fetch all portfolios for the user
         return portfolioRepository.findAllById(cpdto.getUserId());
     }
 
-    @Transactional
     public Portfolio deletePortfolio(DeletePortfolioDto dpdto) {
         //check if user exist
-        User user = checkIfUserExists(dpdto.getUserId());
+        User user = Utils.checkIfUserExists(dpdto.getUserId(), userRepository);
         //check if a portfolio exists for that user
         Portfolio portfolio = portfolioRepository.findPortfolioByUserIdAndPortfolioId(dpdto.getUserId(), dpdto.getPortfolioId());
         if (Objects.isNull(portfolio)) {
@@ -58,22 +56,5 @@ public class PortfolioService {
 
 
 
-    private User checkIfUserExists(Long cpdto) {
-        Optional<User> user = userRepository.findById(cpdto);
-        //user exists ? return user
-        if (user.isEmpty()) {
-        // else -->>  throw exception
-            throw new CustomException("User does not exist.");
-        }
-        return user.get();
-    }
-    private Portfolio checkIfPortfolioExists(Long dpdto) {
-        Optional<Portfolio> portfolio = portfolioRepository.findById(dpdto);
-        //portfolio exists ? return user
-        if (portfolio.isEmpty()) {
-            // else -->>  throw exception
-            throw new CustomException("Portfolio does not exist.");
-        }
-        return portfolio.get();
-    }
+
 }

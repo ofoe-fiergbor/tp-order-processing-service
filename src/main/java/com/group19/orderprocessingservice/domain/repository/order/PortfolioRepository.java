@@ -11,10 +11,10 @@ import java.util.List;
 @Repository
 public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
-    @Query(value = "SELECT * FROM portfolio WHERE portfolio.user_id = :id", nativeQuery=true)
+    @Query(value = "SELECT * FROM portfolios WHERE portfolios.user_id = :id", nativeQuery=true)
     List<Portfolio> findAllById(@Param("id") Long id);
 
-    @Query(value = "SELECT * FROM portfolio WHERE portfolio.userId = :userId AND portfolio.id = :portfolioId", nativeQuery=true)
+    @Query(value = "SELECT * FROM portfolios WHERE portfolios.user_id = :userId AND portfolios.id = :portfolioId", nativeQuery=true)
     Portfolio findPortfolioByUserIdAndPortfolioId(@Param("userId") Long userId, @Param("portfolioId") Long portfolioId);
 
 }
