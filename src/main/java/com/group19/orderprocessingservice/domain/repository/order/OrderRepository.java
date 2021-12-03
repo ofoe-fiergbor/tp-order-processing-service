@@ -1,6 +1,6 @@
-package com.group19.orderprocessingservice.domain.repository;
+package com.group19.orderprocessingservice.domain.repository.order;
 
-import com.group19.orderprocessingservice.domain.model.Order;
+import com.group19.orderprocessingservice.domain.model.order.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

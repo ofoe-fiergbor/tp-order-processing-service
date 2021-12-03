@@ -1,5 +1,6 @@
-package com.group19.orderprocessingservice.domain.model;
+package com.group19.orderprocessingservice.domain.model.order;
 
+import com.group19.orderprocessingservice.domain.model.auth.User;
 import com.group19.orderprocessingservice.enums.PortfolioStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,17 +21,18 @@ public class Portfolio {
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createdAt", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private Date createdAt;
 
     @Enumerated(EnumType.STRING)
     private PortfolioStatus portfolioStatus;
 
-    @Column
-    private long userId;
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false, name = "user_id")
+    private User user;
 
-    public Portfolio(long userId) {
-        this.userId = userId;
+    public Portfolio(User user) {
+        this.user = user;
         this.portfolioStatus = PortfolioStatus.ACTIVE;
     }
 }

@@ -1,12 +1,13 @@
 package com.group19.orderprocessingservice.services;
 
-import com.group19.orderprocessingservice.domain.model.Order;
-import com.group19.orderprocessingservice.domain.model.StockProduct;
-import com.group19.orderprocessingservice.domain.repository.OrderRepository;
+import com.group19.orderprocessingservice.domain.model.order.Order;
+import com.group19.orderprocessingservice.domain.model.order.StockProduct;
+import com.group19.orderprocessingservice.domain.repository.order.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ public class OrderService {
     private OrderRepository orderRepository;
 
 
+    @Transactional
     public Order placeTransaction(Order order) {
 
         StockProduct stockProduct1 = restTemplate.getForObject("http://localhost:8086/market-data/fetch/exchange-one/"+order.getProduct().toUpperCase(Locale.ROOT), StockProduct.class);
