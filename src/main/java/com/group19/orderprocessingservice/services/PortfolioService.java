@@ -33,11 +33,11 @@ public class PortfolioService {
         return portfolioRepository.save(portfolio);
     }
 
-    public Iterable<Portfolio> fetchAll(CreatePortfolioDto cpdto) {
+    public Iterable<Portfolio> fetchAll(long userId) {
         //check the existence of the user
-        Utils.checkIfUserExists(cpdto.getUserId(), userRepository);
+        Utils.checkIfUserExists(userId, userRepository);
         //fetch all portfolios for the user
-        return portfolioRepository.findAllById(cpdto.getUserId());
+        return portfolioRepository.findAllById(userId);
     }
 
     public Portfolio deletePortfolio(DeletePortfolioDto dpdto) {

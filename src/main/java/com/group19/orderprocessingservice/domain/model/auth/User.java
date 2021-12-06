@@ -29,6 +29,9 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "balance")
+    private double balance;
+
     @OneToMany(targetEntity = Portfolio.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "portfolioId", referencedColumnName = "id")
     private List<Portfolio> portfolioList;
@@ -38,5 +41,13 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.balance = 5000.00;
+    }
+
+    public void deposit(double amount) {
+        this.balance += amount;
+    }
+    public void withdraw(double amount) {
+        this.balance -= amount;
     }
 }
