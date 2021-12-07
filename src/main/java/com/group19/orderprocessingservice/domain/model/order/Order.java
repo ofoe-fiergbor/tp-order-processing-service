@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Data
 @Entity
-@Table(name = "orders")
+@Table(name = "stock_orders")
 @NoArgsConstructor
 public class Order {
 
@@ -20,7 +20,7 @@ public class Order {
     private String id;
 
     @CreationTimestamp
-    @Column(name = "createAt", updatable = false)
+    @Column(updatable = false)
     private Date createdAt;
 
     private String product;
@@ -29,11 +29,11 @@ public class Order {
     private Side side;
 
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "userId")
+    @JoinColumn(nullable = false)
     private User user;
 
     @ManyToOne(targetEntity = Portfolio.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "portfolioId", nullable = false)
+    @JoinColumn( nullable = false)
     private Portfolio portfolio;
 
     public Order(String product, int quantity, Side side, double price, User user, Portfolio portfolio) {

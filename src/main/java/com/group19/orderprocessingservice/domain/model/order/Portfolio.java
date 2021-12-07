@@ -29,12 +29,12 @@ public class Portfolio {
     private PortfolioStatus portfolioStatus;
 
     @ManyToOne(targetEntity = User.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(nullable = false)
     private User user;
 
-    @OneToMany(targetEntity = Order.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "orderId", referencedColumnName = "id")
-    private List<Order> orderList;
+//    @OneToMany(targetEntity = Order.class, cascade = CascadeType.ALL)
+//    @JoinColumn(updatable = false)
+//    private List<Order> orderList;
 
 
     public Portfolio(User user) {

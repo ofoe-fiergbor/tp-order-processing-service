@@ -1,4 +1,4 @@
-package com.group19.orderprocessingservice.domain.model.order;
+package com.group19.orderprocessingservice.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

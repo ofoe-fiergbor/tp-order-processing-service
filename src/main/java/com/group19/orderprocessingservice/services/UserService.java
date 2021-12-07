@@ -31,8 +31,7 @@ public class UserService {
     public ResponseDto signup(SignUpDto sudto) {
         //check if user is already present
         if (Objects.nonNull(userRepository.findByEmail(sudto.getEmail()))) {
-//            throw new CustomException("There's already an account with this email.");
-            return new ResponseDto(ResponseDTOStatus.FAILED.toString(), "There's already an account with this email.");
+            return new ResponseDto(ResponseDTOStatus.FAILED, "There's already an account with this email.");
 
         }
         //hash password
@@ -53,7 +52,7 @@ public class UserService {
         userRepository.save(newUser);
         final AuthenticationToken authenticationToken = new AuthenticationToken(newUser);
         authenticationService.saveConfirmationToken(authenticationToken);
-        return new ResponseDto("success", "user registered successfully!", newUser);
+        return new ResponseDto(ResponseDTOStatus.SUCCESS, "user registered successfully!", newUser);
     }
 
     @Transactional
@@ -61,13 +60,14 @@ public class UserService {
         //find user by email
         User user = userRepository.findByEmail(sidto.getEmail());
         if (Objects.isNull(user)) {
-            throw new AuthenticationFailedException("User does not exist!");
+            return new ResponseDto(ResponseDTOStatus.FAILED, "User does not exist!");
         }
+
         //hash password and compare with hashed pw in database
         try{
             if (!user.getPassword().equals(hashPassword(sidto.getPassword().trim()))) {
 //                throw new AuthenticationFailedException("Wrong password!");
-                return new ResponseDto(ResponseDTOStatus.SUCCESS.toString(), "Wrong password");
+                return new ResponseDto(ResponseDTOStatus.SUCCESS, "Wrong password");
             }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -78,9 +78,9 @@ public class UserService {
 
         if (Objects.isNull(authenticationToken)) {
 //            throw new CustomException("Token is not present");
-            return new ResponseDto(ResponseDTOStatus.FAILED.toString(), "Token is not present");
+            return new ResponseDto(ResponseDTOStatus.FAILED, "Token is not present");
         }
-        return new ResponseDto(ResponseDTOStatus.SUCCESS.toString(), "login successful!", authenticationToken);
+        return new ResponseDto(ResponseDTOStatus.SUCCESS, "login successful!", authenticationToken);
     }
 
     private String hashPassword(String password) throws NoSuchAlgorithmException {
