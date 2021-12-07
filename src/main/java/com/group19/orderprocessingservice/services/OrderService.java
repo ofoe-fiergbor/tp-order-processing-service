@@ -1,11 +1,12 @@
 package com.group19.orderprocessingservice.services;
 
 import com.group19.orderprocessingservice.domain.dto.CreateOrderDto;
+import com.group19.orderprocessingservice.domain.dto.PortfolioItemDto;
 import com.group19.orderprocessingservice.domain.dto.ResponseDto;
 import com.group19.orderprocessingservice.domain.model.auth.User;
 import com.group19.orderprocessingservice.domain.model.order.Order;
 import com.group19.orderprocessingservice.domain.model.order.Portfolio;
-import com.group19.orderprocessingservice.domain.model.order.StockProduct;
+import com.group19.orderprocessingservice.domain.dto.StockProduct;
 import com.group19.orderprocessingservice.domain.repository.auth.UserRepository;
 import com.group19.orderprocessingservice.domain.repository.order.OrderRepository;
 import com.group19.orderprocessingservice.domain.repository.order.PortfolioRepository;
@@ -15,12 +16,12 @@ import com.group19.orderprocessingservice.util.Utils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.RestTemplate;
 
-import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Log4j2
 @Service

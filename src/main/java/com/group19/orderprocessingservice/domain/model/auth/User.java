@@ -32,9 +32,9 @@ public class User {
     @Column(name = "balance")
     private double balance;
 
-    @OneToMany(targetEntity = Portfolio.class, cascade = CascadeType.ALL)
-    @JoinColumn(name = "portfolioId", referencedColumnName = "id")
-    private List<Portfolio> portfolioList;
+//    @OneToMany(targetEntity = Portfolio.class, cascade = CascadeType.ALL)
+//    @JoinColumn(referencedColumnName = "id")
+//    private List<Portfolio> portfolioList;
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
