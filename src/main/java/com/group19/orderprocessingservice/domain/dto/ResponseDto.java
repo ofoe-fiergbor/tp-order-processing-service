@@ -1,6 +1,6 @@
 package com.group19.orderprocessingservice.domain.dto;
 
-import lombok.AllArgsConstructor;
+import com.group19.orderprocessingservice.enums.ResponseDTOStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,17 +8,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ResponseDto {
-    private String status;
+    private ResponseDTOStatus status;
     private String message;
     private Object object;
 
-    public ResponseDto(String status, String message, Object object) {
+    public ResponseDto(ResponseDTOStatus status, String message, Object object) {
         this.status = status;
         this.message = message;
         this.object = object;
     }
 
-    public ResponseDto(String status, String message) {
+    public ResponseDto(ResponseDTOStatus status, String message) {
         this.status = status;
         this.message = message;
     }

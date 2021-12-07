@@ -1,5 +1,6 @@
 package com.group19.orderprocessingservice.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group19.orderprocessingservice.enums.Side;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class CreateOrderDto {
     @JsonProperty("side")
     private Side side;
 
+    @JsonIgnore
     @JsonProperty("price")
     private double price;
 
