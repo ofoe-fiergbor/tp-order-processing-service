@@ -1,5 +1,6 @@
-package com.group19.orderprocessingservice.services;
+package com.group19.orderprocessingservice.services.auth;
 
+import com.group19.orderprocessingservice.domain.dto.MessageDto;
 import com.group19.orderprocessingservice.domain.dto.ResponseDto;
 import com.group19.orderprocessingservice.domain.dto.SignInDto;
 import com.group19.orderprocessingservice.domain.dto.SignUpDto;
@@ -7,30 +8,43 @@ import com.group19.orderprocessingservice.domain.model.auth.AuthenticationToken;
 import com.group19.orderprocessingservice.domain.model.auth.User;
 import com.group19.orderprocessingservice.domain.repository.auth.UserRepository;
 import com.group19.orderprocessingservice.enums.ResponseDTOStatus;
-import com.group19.orderprocessingservice.exceptions.AuthenticationFailedException;
-import com.group19.orderprocessingservice.exceptions.CustomException;
+import com.group19.orderprocessingservice.services.firebase.MessagingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserService {
 
-    @Autowired
+    private final
     UserRepository userRepository;
 
-    @Autowired
+    private final
     AuthenticationService authenticationService;
 
+    private final
+    MessagingService messagingService;
+
+    @Autowired
+    public UserService(UserRepository userRepository, AuthenticationService authenticationService, MessagingService messagingService) {
+        this.userRepository = userRepository;
+        this.authenticationService = authenticationService;
+        this.messagingService = messagingService;
+    }
+
+
     @Transactional
-    public ResponseDto signup(SignUpDto sudto) {
+    public ResponseDto signup(SignUpDto sudto) throws ExecutionException, InterruptedException {
+
+        messagingService.saveMessage(new MessageDto("User Authentication:: Sign up execution for "+ sudto.getFirstName() + " " + sudto.getLastName()));
         //check if user is already present
         if (Objects.nonNull(userRepository.findByEmail(sudto.getEmail()))) {
+            messagingService.saveMessage(new MessageDto("User Authentication:: Failed to create account for "+ sudto.getFirstName() + " " + sudto.getLastName()));
             return new ResponseDto(ResponseDTOStatus.FAILED, "There's already an account with this email.");
 
         }
@@ -52,14 +66,19 @@ public class UserService {
         userRepository.save(newUser);
         final AuthenticationToken authenticationToken = new AuthenticationToken(newUser);
         authenticationService.saveConfirmationToken(authenticationToken);
+
+        messagingService.saveMessage(new MessageDto("User Authentication:: Account for "+ sudto.getFirstName() + " " + sudto.getLastName()+" created successfully."));
         return new ResponseDto(ResponseDTOStatus.SUCCESS, "user registered successfully!", newUser);
     }
 
     @Transactional
-    public ResponseDto signin(SignInDto sidto) {
+    public ResponseDto signIn(SignInDto sidto) throws ExecutionException, InterruptedException {
         //find user by email
+        messagingService.saveMessage(new MessageDto("User Authentication:: Sign up execution for "+ sidto.getEmail()));
+
         User user = userRepository.findByEmail(sidto.getEmail());
         if (Objects.isNull(user)) {
+            messagingService.saveMessage(new MessageDto("User Authentication:: Failed to sign into account for "+ sidto.getEmail()+ " :: User does not exist."));
             return new ResponseDto(ResponseDTOStatus.FAILED, "User does not exist!");
         }
 
@@ -67,6 +86,7 @@ public class UserService {
         try{
             if (!user.getPassword().equals(hashPassword(sidto.getPassword().trim()))) {
 //                throw new AuthenticationFailedException("Wrong password!");
+                messagingService.saveMessage(new MessageDto("User Authentication:: Failed to sign into account for "+ sidto.getEmail()+":: Wrong password."));
                 return new ResponseDto(ResponseDTOStatus.SUCCESS, "Wrong password");
             }
         } catch (NoSuchAlgorithmException e) {
@@ -78,16 +98,20 @@ public class UserService {
 
         if (Objects.isNull(authenticationToken)) {
 //            throw new CustomException("Token is not present");
+            messagingService.saveMessage(new MessageDto("User Authentication:: Failed to sign into account for "+ sidto.getEmail()+":: Token is not present."));
             return new ResponseDto(ResponseDTOStatus.FAILED, "Token is not present");
         }
+
+        messagingService.saveMessage(new MessageDto("User Authentication:: Success account login for "+ sidto.getEmail()));
         return new ResponseDto(ResponseDTOStatus.SUCCESS, "login successful!", authenticationToken);
     }
 
-    private String hashPassword(String password) throws NoSuchAlgorithmException {
+    private String hashPassword(String password) throws NoSuchAlgorithmException, ExecutionException, InterruptedException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(password.trim().getBytes());
         byte[] digest = md.digest();
         String hash = DatatypeConverter.printHexBinary(digest).toUpperCase();
+        messagingService.saveMessage(new MessageDto("User Authentication:: Password Hashed"));
         return hash;
     }
 }

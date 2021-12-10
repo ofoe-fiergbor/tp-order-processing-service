@@ -1,4 +1,4 @@
-package com.group19.orderprocessingservice.services;
+package com.group19.orderprocessingservice.services.auth;
 
 import com.group19.orderprocessingservice.domain.model.auth.AuthenticationToken;
 import com.group19.orderprocessingservice.domain.model.auth.User;
@@ -9,8 +9,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService {
 
-    @Autowired
+    private final
     TokenRepository tokenRepository;
+
+    public AuthenticationService(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
     public void saveConfirmationToken(AuthenticationToken authenticationToken) {
         tokenRepository.save(authenticationToken);

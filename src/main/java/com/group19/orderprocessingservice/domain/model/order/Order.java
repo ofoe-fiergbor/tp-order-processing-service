@@ -33,7 +33,7 @@ public class Order {
     private User user;
 
     @ManyToOne(targetEntity = Portfolio.class, cascade = CascadeType.ALL)
-    @JoinColumn( nullable = false)
+    @JoinColumn(nullable = false)
     private Portfolio portfolio;
 
     public Order(String product, int quantity, Side side, double price, User user, Portfolio portfolio) {

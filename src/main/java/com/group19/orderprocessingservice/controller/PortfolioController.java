@@ -4,7 +4,7 @@ package com.group19.orderprocessingservice.controller;
 import com.group19.orderprocessingservice.domain.dto.CreatePortfolioDto;
 import com.group19.orderprocessingservice.domain.dto.DeletePortfolioDto;
 import com.group19.orderprocessingservice.domain.model.order.Portfolio;
-import com.group19.orderprocessingservice.services.PortfolioService;
+import com.group19.orderprocessingservice.services.orders.PortfolioService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,19 +12,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/order-processing/portfolio")
 public class PortfolioController {
 
-    @Autowired
+    private final
     PortfolioService portfolioService;
 
+    @Autowired
+    public PortfolioController(PortfolioService portfolioService) {
+        this.portfolioService = portfolioService;
+    }
 
 
     @PostMapping("/add")
     @Operation(summary = "Create a new portfolio.")
-    public ResponseEntity<Portfolio> addNewPortfolio(@RequestBody CreatePortfolioDto pdto) {
+    public ResponseEntity<Portfolio> addNewPortfolio(@RequestBody CreatePortfolioDto pdto) throws ExecutionException, InterruptedException {
         return new ResponseEntity<>(portfolioService.createNewPortfolio(pdto), HttpStatus.CREATED);
     }
 
@@ -37,7 +42,7 @@ public class PortfolioController {
 
     @PostMapping("/close")
     @Operation(summary = "Close/Delete a portfolios for a user.")
-    public ResponseEntity<Portfolio> removePortfolio(@RequestBody DeletePortfolioDto dpdto) {
+    public ResponseEntity<Portfolio> removePortfolio(@RequestBody DeletePortfolioDto dpdto) throws ExecutionException, InterruptedException {
         return new ResponseEntity<>(portfolioService.deletePortfolio(dpdto), HttpStatus.OK);
     }
 
