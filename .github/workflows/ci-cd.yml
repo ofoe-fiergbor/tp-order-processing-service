@@ -82,7 +82,7 @@ jobs:
           aws deploy create-deployment \
            --application-name aws-codedeploy \
            --deployment-config-name CodeDeployDefault.OneAtATime \
-           --deployment-group-name tp-market-data-service \
+           --deployment-group-name tp-order-processing-service \
            --file-exists-behavior OVERWRITE \
            --s3-location bucket=aws-codedeploy-deployments-try,key=staging-aws-codedeploy-dc1ad63e3952d6515378dedcc10a91f123544abd.zip,bundleType=zip \
 
