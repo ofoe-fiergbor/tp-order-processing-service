@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/order-processing/order")
 public class OrderController {
