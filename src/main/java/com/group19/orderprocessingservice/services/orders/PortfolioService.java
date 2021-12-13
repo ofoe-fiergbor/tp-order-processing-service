@@ -36,7 +36,7 @@ public class PortfolioService {
         //check if user exists
         User user = Utils.checkIfUserExists(cpdto.getUserId(), userRepository);
         //create new portfolio
-        Portfolio portfolio = new Portfolio(user);
+        Portfolio portfolio = new Portfolio(user, cpdto.getName());
         //persist portfolio in database
         messagingService.saveMessage("Portfolio :: Portfolio created successfully for user-id "+ cpdto.getUserId());
         return portfolioRepository.save(portfolio);

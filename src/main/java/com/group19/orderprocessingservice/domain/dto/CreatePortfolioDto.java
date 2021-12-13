@@ -12,4 +12,6 @@ public class CreatePortfolioDto {
 
     @JsonProperty("userId")
     private long userId;
+
+    private String name;
 }

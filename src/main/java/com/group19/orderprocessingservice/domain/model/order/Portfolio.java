@@ -32,13 +32,16 @@ public class Portfolio {
     @JoinColumn(nullable = false)
     private User user;
 
+    private String name;
+
 //    @OneToMany(targetEntity = Order.class, cascade = CascadeType.ALL)
 //    @JoinColumn(updatable = false)
 //    private List<Order> orderList;
 
 
-    public Portfolio(User user) {
+    public Portfolio(User user, String name) {
         this.user = user;
         this.portfolioStatus = PortfolioStatus.ACTIVE;
+        this.name = name;
     }
 }

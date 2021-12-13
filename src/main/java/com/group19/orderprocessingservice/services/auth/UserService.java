@@ -59,7 +59,8 @@ public class UserService {
                 sudto.getFirstName(),
                 sudto.getLastName(),
                 sudto.getEmail(),
-                encryptPassword
+                encryptPassword,
+                sudto.getRole()
         );
         userRepository.save(newUser);
         final AuthenticationToken authenticationToken = new AuthenticationToken(newUser);

@@ -1,11 +1,11 @@
 package com.group19.orderprocessingservice.domain.model.auth;
 
-import com.group19.orderprocessingservice.domain.model.order.Portfolio;
+import com.group19.orderprocessingservice.enums.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
+
 
 @Data
 @Entity
@@ -32,16 +32,19 @@ public class User {
     @Column(name = "balance")
     private double balance;
 
+    private Role role;
+
 //    @OneToMany(targetEntity = Portfolio.class, cascade = CascadeType.ALL)
 //    @JoinColumn(referencedColumnName = "id")
 //    private List<Portfolio> portfolioList;
 
-    public User(String firstName, String lastName, String email, String password) {
+    public User(String firstName, String lastName, String email, String password, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.balance = 5000.00;
+        this.role = role;
     }
 
     public void deposit(double amount) {
