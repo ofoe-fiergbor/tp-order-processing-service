@@ -2,22 +2,18 @@ package com.group19.orderprocessingservice.services.orders;
 
 import com.group19.orderprocessingservice.domain.dto.CreatePortfolioDto;
 import com.group19.orderprocessingservice.domain.dto.DeletePortfolioDto;
-import com.group19.orderprocessingservice.domain.dto.MessageDto;
 import com.group19.orderprocessingservice.domain.model.auth.User;
 import com.group19.orderprocessingservice.domain.model.order.Portfolio;
 import com.group19.orderprocessingservice.domain.repository.auth.UserRepository;
 import com.group19.orderprocessingservice.domain.repository.order.PortfolioRepository;
 import com.group19.orderprocessingservice.enums.PortfolioStatus;
 import com.group19.orderprocessingservice.exceptions.CustomException;
-import com.group19.orderprocessingservice.services.firebase.MessagingService;
+import com.group19.orderprocessingservice.services.redis.MessagingService;
 import com.group19.orderprocessingservice.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 @Service
 public class PortfolioService {
@@ -33,16 +29,16 @@ public class PortfolioService {
         this.messagingService = messagingService;
     }
 
-    public Portfolio createNewPortfolio(CreatePortfolioDto cpdto) throws ExecutionException, InterruptedException {
+    public Portfolio createNewPortfolio(CreatePortfolioDto cpdto) {
 
-        messagingService.saveMessage(new MessageDto("Portfolio :: Creating portfolio for user-id - "+ cpdto.getUserId()));
+        messagingService.saveMessage("Portfolio :: Creating portfolio for user-id - "+ cpdto.getUserId());
 
         //check if user exists
         User user = Utils.checkIfUserExists(cpdto.getUserId(), userRepository);
         //create new portfolio
         Portfolio portfolio = new Portfolio(user);
         //persist portfolio in database
-        messagingService.saveMessage(new MessageDto("Portfolio :: Portfolio created successfully for user-id "+ cpdto.getUserId()));
+        messagingService.saveMessage("Portfolio :: Portfolio created successfully for user-id "+ cpdto.getUserId());
         return portfolioRepository.save(portfolio);
     }
 
@@ -53,7 +49,7 @@ public class PortfolioService {
         return portfolioRepository.findAllById(userId);
     }
 
-    public Portfolio deletePortfolio(DeletePortfolioDto dpdto) throws ExecutionException, InterruptedException {
+    public Portfolio deletePortfolio(DeletePortfolioDto dpdto) {
         //check if user exist
         User user = Utils.checkIfUserExists(dpdto.getUserId(), userRepository);
         //check if a portfolio exists for that user
@@ -61,7 +57,7 @@ public class PortfolioService {
         if (Objects.isNull(portfolio)) {
             throw new CustomException("Portfolio does not exist");
         }
-        messagingService.saveMessage(new MessageDto("Portfolio :: Portfolio with portfolio-id - "+ dpdto.getPortfolioId()+" deleted successfully."));
+        messagingService.saveMessage("Portfolio :: Portfolio with portfolio-id - "+ dpdto.getPortfolioId()+" deleted successfully.");
         portfolio.setPortfolioStatus(PortfolioStatus.DELETED);
 
         return portfolioRepository.save(portfolio);
