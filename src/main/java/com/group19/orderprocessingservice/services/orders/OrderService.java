@@ -80,13 +80,21 @@ public class OrderService {
             case "BUY":
                 //if buy ? check for the lowest possible price to buy at from both exchanges
                 messagingService.saveMessage("Trade:: Initiating a \"BUY\" trade execution for "+ codto.getQuantity()+ " shares of "+ codto.getProduct());
-//                log.info("Initiating a \"BUY\" trade execution for "+ codto.getQuantity()+ " shares of "+ codto.getProduct());
+
                 assert stockProduct1 != null;
                 assert stockProduct2 != null;
 
 
+
+
                 //exchange 1
                 if (stockProduct1.getAskPrice() == Math.min(stockProduct1.getAskPrice(), stockProduct2.getAskPrice())) {
+
+                    if (stockProduct1.getBuyLimit() > codto.getQuantity()) {
+                        messagingService.saveMessage("Trade:: Initiating a \"BUY\" trade execution on exchange failed - Transaction above trade limit");
+                        return new ResponseDto(ResponseDTOStatus.FAILED,"The number of shares you wish to purchase are is above the limit");
+                    }
+
                     messagingService.saveMessage("Trade:: Initiating a \"BUY\" trade execution on exchange one");
 
                     if(stockProduct1.getBuyLimit() < codto.getQuantity()) {
@@ -113,6 +121,11 @@ public class OrderService {
                 } else {
                     //exchange 2
                     messagingService.saveMessage("Trade:: Initiating a \"BUY\" trade execution on exchange two");
+                    if (stockProduct2.getBuyLimit() > codto.getQuantity()) {
+                        messagingService.saveMessage("Trade:: Initiating a \"BUY\" trade execution on exchange failed - Transaction above trade limit");
+                        return new ResponseDto(ResponseDTOStatus.FAILED,"The number of shares you wish to purchase are is above the limit");
+                    }
+
 
                     messagingService.saveMessage("Trade:: Initiating a \"SELL\" trade execution for "+ codto.getQuantity()+ " shares of "+ codto.getProduct());
 
@@ -162,9 +175,12 @@ public class OrderService {
 
                 //if sell ? check for the lowest possible price to buy at from both exchanges
                 if (stockProduct1.getBidPrice() == Math.max(stockProduct1.getBidPrice(), stockProduct2.getBidPrice())) {
+
                     messagingService.saveMessage("Trade:: Initiating a \"SELL\" trade execution on exchange one");
+
                     //exchange 1
                     codto.setPrice(stockProduct1.getBidPrice());
+
                     orderToken = restTemplate.postForObject(exchange_one_url + key +"/order", codto, String.class);
 
 
@@ -174,13 +190,18 @@ public class OrderService {
                     messagingService.saveMessage("Trade:: Initiating a \"SELL\" trade execution on exchange two");
 
                     codto.setPrice(stockProduct2.getBidPrice());
+
                     orderToken = restTemplate.postForObject(exchange_two_url+ key +"/order", codto, String.class);
 
                 }
                 tradeValue = codto.getQuantity() * codto.getPrice();
+
                 holding.decreaseQuantity(codto.getQuantity());
+
                 holding.decreaseValue(tradeValue);
+
                 user.deposit(tradeValue);
+
                 order = new Order(codto.getProduct(), codto.getQuantity() * -1, codto.getSide(), codto.getPrice(), user, portfolio);
                 break;
             default:
