@@ -85,7 +85,6 @@ public class UserService {
         //hash password and compare with hashed pw in database
         try{
             if (!user.getPassword().equals(hashPassword(sidto.getPassword().trim()))) {
-//                throw new AuthenticationFailedException("Wrong password!");
                 messagingService.saveMessage("User Authentication:: Failed to sign into account for "+ sidto.getEmail()+":: Wrong password.");
                 return new ResponseDto(ResponseDTOStatus.SUCCESS, "Wrong password");
             }
@@ -97,7 +96,6 @@ public class UserService {
         AuthenticationToken authenticationToken = authenticationService.getToken(user);
 
         if (Objects.isNull(authenticationToken)) {
-//            throw new CustomException("Token is not present");
             messagingService.saveMessage("User Authentication:: Failed to sign into account for "+ sidto.getEmail()+":: Token is not present.");
             return new ResponseDto(ResponseDTOStatus.FAILED, "Token is not present");
         }

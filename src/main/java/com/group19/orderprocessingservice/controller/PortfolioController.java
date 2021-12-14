@@ -30,7 +30,7 @@ public class PortfolioController {
 
     @PostMapping("/add")
     @Operation(summary = "Create a new portfolio.")
-    public ResponseEntity<Portfolio> addNewPortfolio(@RequestBody CreatePortfolioDto pdto) throws ExecutionException, InterruptedException {
+    public ResponseEntity<Portfolio> addNewPortfolio(@RequestBody CreatePortfolioDto pdto)  {
         return new ResponseEntity<>(portfolioService.createNewPortfolio(pdto), HttpStatus.CREATED);
     }
 
@@ -43,8 +43,13 @@ public class PortfolioController {
 
     @PostMapping("/close")
     @Operation(summary = "Close/Delete a portfolios for a user.")
-    public ResponseEntity<Portfolio> removePortfolio(@RequestBody DeletePortfolioDto dpdto) throws ExecutionException, InterruptedException {
+    public ResponseEntity<Portfolio> removePortfolio(@RequestBody DeletePortfolioDto dpdto)  {
         return new ResponseEntity<>(portfolioService.deletePortfolio(dpdto), HttpStatus.OK);
+    }
+
+    @GetMapping("/{portfolioId}")
+    public ResponseEntity<?> fetchSinglePortfolio(@PathVariable long portfolioId) {
+        return new ResponseEntity<>(portfolioService.getPortfolio(portfolioId), HttpStatus.OK);
     }
 
 
