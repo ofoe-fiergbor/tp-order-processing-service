@@ -114,8 +114,8 @@ public class UserService {
     }
 
     public ResponseDto fetchAllUsers(){
-
+        List<User> allUsers = userRepository.findAll();
         return
-                new ResponseDto(ResponseDTOStatus.SUCCESS,"User found",userRepository.findAll());
+                new ResponseDto(ResponseDTOStatus.SUCCESS, allUsers.isEmpty() ? "No user available at the moment" : "User found", allUsers);
     }
 }

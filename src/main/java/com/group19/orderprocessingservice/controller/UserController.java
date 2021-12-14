@@ -38,6 +38,7 @@ public class UserController {
 
     //get-allUsers endpoint
     @GetMapping("/admin/all-users")
+    @Operation(summary = "Fetching all users")
     public ResponseEntity<ResponseDto> fetchAllUsers(){
         return new ResponseEntity<>(userService.fetchAllUsers(),HttpStatus.FOUND);
     }
