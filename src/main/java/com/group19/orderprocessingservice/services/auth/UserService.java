@@ -116,7 +116,11 @@ public class UserService {
     }
 
     public ResponseDto fetchAllUsers(){
-
-        return new ResponseDto(ResponseDTOStatus.SUCCESS,"User found",userRepository.findAll());
+        //gets all the all
+        var users = userRepository.findAll();
+//        checks if users exist
+        return (users.isEmpty())?
+                new ResponseDto(ResponseDTOStatus.SUCCESS,"No users found"):
+                new ResponseDto(ResponseDTOStatus.SUCCESS,"User found",users);
     }
 }
