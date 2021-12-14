@@ -1,5 +1,6 @@
 package com.group19.orderprocessingservice.domain.repository.order;
 
+import com.group19.orderprocessingservice.domain.model.order.Order;
 import com.group19.orderprocessingservice.domain.model.order.Portfolio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +17,6 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Long> {
 
     @Query(value = "SELECT * FROM portfolios WHERE portfolios.user_id = :userId AND portfolios.id = :portfolioId", nativeQuery=true)
     Portfolio findPortfolioByUserIdAndPortfolioId(@Param("userId") Long userId, @Param("portfolioId") Long portfolioId);
+
 
 }

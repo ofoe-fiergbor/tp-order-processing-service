@@ -18,8 +18,12 @@ import java.util.concurrent.ExecutionException;
 @RequestMapping("/order-processing/order")
 public class OrderController {
 
+    private final OrderService orderService;
+
     @Autowired
-    private OrderService orderService;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @PostMapping("/place")
     @Operation(summary = "Place an new buy or sell order.")

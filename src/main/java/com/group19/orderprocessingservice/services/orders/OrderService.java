@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -33,6 +34,9 @@ public class OrderService {
 
     private final MessagingService messagingService;
 
+    private final PortfolioService portfolioService;
+
+
 
     @Value("${system.exchange_one}")
     private String exchange_one_url;
@@ -44,12 +48,13 @@ public class OrderService {
     private String key;
 
     @Autowired
-    public OrderService(RestTemplate restTemplate, OrderRepository orderRepository, UserRepository userRepository, PortfolioRepository portfolioRepository, MessagingService messagingService) {
+    public OrderService(RestTemplate restTemplate, OrderRepository orderRepository, UserRepository userRepository, PortfolioRepository portfolioRepository, MessagingService messagingService, PortfolioService portfolioService) {
         this.restTemplate = restTemplate;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.portfolioRepository = portfolioRepository;
         this.messagingService = messagingService;
+        this.portfolioService = portfolioService;
     }
 
 
@@ -66,6 +71,7 @@ public class OrderService {
 
         double orderValue;
         String orderToken;
+        Order order = null;
 
 
 
@@ -78,9 +84,14 @@ public class OrderService {
                 assert stockProduct1 != null;
                 assert stockProduct2 != null;
 
+
                 //exchange 1
-                if (Math.max(stockProduct1.getAskPrice(), stockProduct2.getAskPrice()) == stockProduct1.getAskPrice()) {
+                if (stockProduct1.getAskPrice() == Math.min(stockProduct1.getAskPrice(), stockProduct2.getAskPrice())) {
                     messagingService.saveMessage("Trade:: Initiating a \"BUY\" trade execution on exchange one");
+
+                    if(stockProduct1.getBuyLimit() < codto.getQuantity()) {
+                        return new ResponseDto(ResponseDTOStatus.FAILED,"The number of shares you wish to purchase are unavailable");
+                    }
 
                     codto.setPrice(stockProduct1.getAskPrice());
 
@@ -104,6 +115,11 @@ public class OrderService {
                     messagingService.saveMessage("Trade:: Initiating a \"BUY\" trade execution on exchange two");
 
                     messagingService.saveMessage("Trade:: Initiating a \"SELL\" trade execution for "+ codto.getQuantity()+ " shares of "+ codto.getProduct());
+
+                    if(stockProduct2.getBuyLimit() < codto.getQuantity()) {
+                        return new ResponseDto(ResponseDTOStatus.FAILED,"The number of shares you wish to purchase are unavailable");
+                    }
+
                     codto.setPrice(stockProduct2.getAskPrice());
 
 
@@ -114,7 +130,7 @@ public class OrderService {
 
 
                     if (user.getBalance() <= orderValue) {
-                        messagingService.saveMessage("Trade:: You have insufficient funds to execute trade for "+ codto.getQuantity()+ " shares of "+ codto.getProduct());
+                        messagingService.saveMessage("Trade:: User "+codto.getUserId()+" has insufficient funds to execute trade for "+ codto.getQuantity()+ " shares of "+ codto.getProduct());
 
 
                         return new ResponseDto(ResponseDTOStatus.FAILED, "You don't have enough balance to place this trade!");
@@ -123,39 +139,55 @@ public class OrderService {
 
                     //withdraw trade value from user's account
                 }
-
                 user.withdraw(orderValue);
 
-                messagingService.saveMessage("Trade:: Execution for "+ codto.getQuantity()+ " shares of "+ codto.getProduct() + " completed.");
+                 order = new Order(codto.getProduct(), codto.getQuantity(), codto.getSide(), codto.getPrice(), user, portfolio);
 
+                messagingService.saveMessage("Trade:: Execution for "+ codto.getQuantity()+ " shares of "+ codto.getProduct() + " completed.");
                 break;
 
 
             case "SELL":
-//                log.info("Initiating a \"SELL\" trade execution for" + codto.getQuantity()+ " shares of "+ codto.getProduct());
                 assert stockProduct1 != null;
                 assert stockProduct2 != null;
-                //if sell ? check for the lowest possible price to buy at from both exchanges
-                if (Math.min(stockProduct1.getBidPrice(), stockProduct2.getBidPrice()) == stockProduct1.getBidPrice()) {
-                    messagingService.saveMessage("Trade:: Initiating a \"SELL\" trade execution on exchange one");
 
+                double tradeValue;
+
+                Map<String, Holding> holdings = portfolioService.getPortfolio(codto.getPortfolioId());
+
+                if (!holdings.containsKey(codto.getProduct())) {
+                    return new ResponseDto(ResponseDTOStatus.FAILED, "You don't have this product in your portfolio");
+                }
+                Holding holding = holdings.get(codto.getProduct());
+
+                //if sell ? check for the lowest possible price to buy at from both exchanges
+                if (stockProduct1.getBidPrice() == Math.max(stockProduct1.getBidPrice(), stockProduct2.getBidPrice())) {
+                    messagingService.saveMessage("Trade:: Initiating a \"SELL\" trade execution on exchange one");
                     //exchange 1
                     codto.setPrice(stockProduct1.getBidPrice());
                     orderToken = restTemplate.postForObject(exchange_one_url + key +"/order", codto, String.class);
+
+
+
                 } else {
                     //exchange 2
                     messagingService.saveMessage("Trade:: Initiating a \"SELL\" trade execution on exchange two");
 
                     codto.setPrice(stockProduct2.getBidPrice());
                     orderToken = restTemplate.postForObject(exchange_two_url+ key +"/order", codto, String.class);
+
                 }
+                tradeValue = codto.getQuantity() * codto.getPrice();
+                holding.decreaseQuantity(codto.getQuantity());
+                holding.decreaseValue(tradeValue);
+                user.deposit(tradeValue);
+                order = new Order(codto.getProduct(), codto.getQuantity() * -1, codto.getSide(), codto.getPrice(), user, portfolio);
                 break;
             default:
                 throw new OrderSideException("Unexpected value: " + codto.getSide().toString().toUpperCase());
         }
 
-        Order order = new Order(codto.getProduct(), codto.getQuantity(),
-                codto.getSide(), codto.getPrice(), user, portfolio);
+
         order.setId(orderToken);
         orderRepository.save(order);
         messagingService.saveMessage("Trade:: Transaction executed successfully.");
