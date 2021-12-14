@@ -116,8 +116,7 @@ public class UserService {
     }
 
     public ResponseDto fetchAllUsers(){
-        return (userRepository.findAll().isEmpty())?
-                new ResponseDto(ResponseDTOStatus.SUCCESS,"No users found"):
-                new ResponseDto(ResponseDTOStatus.SUCCESS,"User found",userRepository.findAll());
+
+        return new ResponseDto(ResponseDTOStatus.SUCCESS,"User found",userRepository.findAll());
     }
 }
