@@ -35,4 +35,10 @@ public class UserController {
     public ResponseEntity<ResponseDto> userLogin(@RequestBody SignInDto signinDto) throws ExecutionException, InterruptedException {
         return new ResponseEntity<>(userService.signIn(signinDto), HttpStatus.OK);
     }
+
+    //get-allUsers endpoint
+    @GetMapping("/admin/all-users")
+    public ResponseEntity<ResponseDto> fetchAllUsers(){
+        return new ResponseEntity<>(userService.fetchAllUsers(),HttpStatus.FOUND);
+    }
 }

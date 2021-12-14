@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -112,5 +113,11 @@ public class UserService {
         String hash = DatatypeConverter.printHexBinary(digest).toUpperCase();
         messagingService.saveMessage("User Authentication:: Password Hashed");
         return hash;
+    }
+
+    public ResponseDto fetchAllUsers(){
+        return (userRepository.findAll().isEmpty())?
+                new ResponseDto(ResponseDTOStatus.SUCCESS,"No users found"):
+                new ResponseDto(ResponseDTOStatus.SUCCESS,"User found",userRepository.findAll());
     }
 }
